@@ -24,7 +24,6 @@ Funkcja DodajKsiazke umożliwia użytkownikowi dodanie nowej książki do listy.
 Funkcja UsunKsiazke umożliwia użytkownikowi usunięcie książki z listy. Program wyświetla wszystkie książki wraz z ich ID, a następnie prosi użytkownika o wprowadzenie ID książki do usunięcia. Jeśli podane ID istnieje w liście książek, program usuwa odpowiednią książkę z listy i zapisuje zmienioną listę z powrotem do pliku JSON.
 Wszystkie funkcje kończą się wywołaniem funkcji Main(null), co powoduje powrót do menu głównego po wykonaniu wybranej operacji.
 
-![image](https://github.com/lemur112/Books-Managment/assets/105245169/0a8eae0a-7a12-41fc-a90a-49b43329369d)
 ![image](https://github.com/lemur112/Books-Managment/assets/105245169/1747d4e0-538b-4719-8d1d-3e308700c878)
 ![image](https://github.com/lemur112/Books-Managment/assets/105245169/b0bdfe59-4619-4f92-90f2-1ade99066b89)
 
