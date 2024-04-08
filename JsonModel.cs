@@ -6,12 +6,15 @@ using System.Threading.Tasks;
 
 namespace ksiegarnia
 {
-    internal class JsonModel
+    public class JsonModel
     {
-        public required int ID { get; set; }
-        public required string tytul { get; set; }
-        public required string Autor { get; set; }
-        public required DateTime RokWydania { get; set; }
-        public required string Gatunek { get; set; }
+        
+            public required string ID { get; set; }
+            public required string tytul { get; set; }
+            public required string Autor { get; set; }
+            public required string RokWydania { get; set; }
+            public required string Gatunek { get; set; }
+        
+        
     }
 }
