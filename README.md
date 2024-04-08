@@ -17,6 +17,7 @@ Funkcja WyszukajKsiazkePoTytule umożliwia użytkownikowi wyszukanie książki p
 ![image](https://github.com/lemur112/Books-Managment/assets/105245169/20e70c68-78f7-4e63-80c3-13ccea4246d2)
 
 Funkcja DodajKsiazke umożliwia użytkownikowi dodanie nowej książki do listy. Użytkownik jest proszony o wprowadzenie tytułu, autora, roku wydania i gatunku książki. Następnie program tworzy nowy obiekt JsonModel reprezentujący książkę i dodaje go do listy książek. Lista jest następnie zapisywana z powrotem do pliku JSON.
+
 ![image](https://github.com/lemur112/Books-Managment/assets/105245169/fdd3046e-f5cf-40d3-b68c-de576ac3bd88)
 ![image](https://github.com/lemur112/Books-Managment/assets/105245169/0374bb72-d903-41d5-b78e-9a2a8bb9784e)
 
