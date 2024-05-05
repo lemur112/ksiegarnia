@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System.Reflection.Metadata;
 using System.Transactions;
-
+// PLIK JSON ZNAJDUJĄ SIE W FOLDERZE BIN/DEBUG
 namespace ksiegarnia
 {
     public class Program
@@ -56,20 +56,38 @@ namespace ksiegarnia
 
             
         }
-        public static void WyswietlWszystkieKsiazki()
-        {
-            Console.Clear();
-            string json = File.ReadAllText("ksiazki.json");
-            List<JsonModel> ksiazki = JsonConvert.DeserializeObject<List<JsonModel>>(json);
 
-            Console.WriteLine("Wszystkie książki: ");
+        public static void foreachshowall()
+        {
             foreach (var ksiazka in ksiazki)
             {
                 Console.WriteLine(
                     $"{ksiazka.ID}.\n" +
                     $"{ksiazka.tytul} - {ksiazka.Autor} \n" +
-                    $"Rok Wydania: {ksiazka.RokWydania}, Gatunek: {ksiazka.Gatunek} \n");
+                    $"Rok Wydania: {ksiazka.RokWydania}, Gatunek: {ksiazka.Gatunek} \n" +
+                    $"Cena: {ksiazka.Cena}, {ksiazka.Stan}\n");
+
+                KsiazkaElektroniczna ksiazkaElektroniczna = (KsiazkaElektroniczna)ksiazka;
+                if (ksiazka.Wersja == WersjaKsiazki.Audiobook)
+                {
+                    string narrator = ksiazkaElektroniczna.narrator;
+                    Console.WriteLine($"Narrator: {narrator}");
+                }
+                else if (ksiazka.Wersja == WersjaKsiazki.Ebook)
+                {
+                    string rozmiar = ksiazkaElektroniczna.rozmiar;
+                    Console.WriteLine($"Rozmiar: {rozmiar}");
+                }
             }
+        }
+        public static void WyswietlWszystkieKsiazki()
+        {
+            Console.Clear();
+            string json = File.ReadAllText("ksiazki.json");
+            List<Ksiazka> ksiazki = JsonConvert.DeserializeObject<List<Ksiazka>>(json);
+
+            Console.WriteLine("Wszystkie książki: ");
+            foreachshowall();
             Console.WriteLine("Naciśnij Enter aby wrócić do menu...");
             Console.ReadLine();
             Main(null);
@@ -78,7 +96,7 @@ namespace ksiegarnia
         {
             Console.Clear();
             string json = File.ReadAllText("ksiazki.json");
-            List<JsonModel> ksiazki = JsonConvert.DeserializeObject<List<JsonModel>>(json);
+            List<Ksiazka> ksiazki = JsonConvert.DeserializeObject<List<Ksiazka>>(json);
 
             Console.WriteLine("Podaj tytuł książki: ");
             string szukanyTytul = Console.ReadLine();
@@ -92,20 +110,7 @@ namespace ksiegarnia
             }
 
             bool czyZnaleziono = false;
-            foreach (var ksiazka in ksiazki)
-            {
-                if (ksiazka.tytul.Contains(szukanyTytul))
-                {
-                    Console.Clear();
-                    Console.WriteLine("Znaleziono książkę: \n");
-                    czyZnaleziono = true;
-                    Console.WriteLine(
-                    $"{ksiazka.ID}.\n" +
-                    $"{ksiazka.tytul} - {ksiazka.Autor} \n" +
-                    $"Rok Wydania: {ksiazka.RokWydania}, Gatunek: {ksiazka.Gatunek} \n");
-                }
-                 
-            }
+            foreachshowall();
 
             if(!czyZnaleziono)
             {
@@ -119,7 +124,7 @@ namespace ksiegarnia
         {
             Console.Clear();
             string json = File.ReadAllText("ksiazki.json");
-            List<JsonModel> ksiazki = JsonConvert.DeserializeObject<List<JsonModel>>(json);
+            List<Ksiazka> ksiazki = JsonConvert.DeserializeObject<List<Ksiazka>>(json);
 
             Console.WriteLine("Podaj tytuł książki: ");
             string tytul = Console.ReadLine();
@@ -133,13 +138,45 @@ namespace ksiegarnia
             Console.WriteLine("\n Podaj gatunek książki: ");
             string gatunek = Console.ReadLine();
 
-            ksiazki.Add(new JsonModel
+            Console.WriteLine("\n Podaj cenę książki: ");
+            bool czyPoprawnaCena = float.TryParse(Console.ReadLine(), out float cena);
+            if (!czyPoprawnaCena)
+            {
+                Console.WriteLine("Niepoprawna cena");
+                Console.WriteLine("Naciśnij Enter aby wrócić do menu...");
+                Console.ReadLine();
+                Main(null);
+            }   
+
+            Console.WriteLine("\n Podaj stan książki: ");
+            string stan = Console.ReadLine();
+
+            Console.WriteLine("\n Podaj wersję książki: ");
+            Console.WriteLine("1) Papierowa");
+            Console.WriteLine("2) Ebook");
+            Console.WriteLine("3) Audiobook");
+
+            bool czyPoprawnaWersja = int.TryParse(Console.ReadLine(), out int wersja);
+            if (!czyPoprawnaWersja)
+            {
+                Console.WriteLine("Niepoprawna wersja");
+                Console.WriteLine("Naciśnij Enter aby wrócić do menu...");
+                Console.ReadLine();
+                Main(null);
+            }
+            
+
+
+           ksiazki.Add(new Ksiazka
             {
                 ID = (ksiazki.Count + 1).ToString(),
                 tytul = tytul,
                 Autor = autor,
                 RokWydania = rokWydania,
-                Gatunek = gatunek
+                Gatunek = gatunek,
+                Cena = cena,
+                Stan = stan,
+                Wersja = (WersjaKsiazki)wersja
             });
             
             json = JsonConvert.SerializeObject(ksiazki);
@@ -157,21 +194,15 @@ namespace ksiegarnia
         {
             Console.Clear();
             string json = File.ReadAllText("ksiazki.json");
-            List<JsonModel> ksiazki = JsonConvert.DeserializeObject<List<JsonModel>>(json);
+            List<Ksiazka> ksiazki = JsonConvert.DeserializeObject<List<Ksiazka>>(json);
 
-            foreach (var ksiazka in ksiazki)
-            {
-                Console.WriteLine(
-                    $"{ksiazka.ID}.\n" +
-                    $"{ksiazka.tytul} - {ksiazka.Autor} \n" +
-                    $"Rok Wydania: {ksiazka.RokWydania}, Gatunek: {ksiazka.Gatunek} \n");
-            }
+            foreachshowall();
 
             Console.WriteLine("Podaj ID książki do usunięcia: ");
             bool czyPoprawneId = int.TryParse(Console.ReadLine(), out int id);
             if (czyPoprawneId)
             {
-                JsonModel ksiazkaDoUsuniecia = ksiazki.FirstOrDefault(x => x.ID == id.ToString());
+                Ksiazka ksiazkaDoUsuniecia = ksiazki.FirstOrDefault(x => x.ID == id.ToString());
                 if (ksiazkaDoUsuniecia != null)
                 {
                     ksiazki.Remove(ksiazkaDoUsuniecia);
