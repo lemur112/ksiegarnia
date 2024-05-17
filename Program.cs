@@ -16,9 +16,8 @@ namespace ksiegarnia
             Console.WriteLine("3) Dodaj nową książkę");
             Console.WriteLine("4) Usuń książkę");
             Console.WriteLine("5) Wyjdź");
-            
-            bool czyPoprawnaOpcja = int.TryParse(Console.ReadLine(), out int opcja);
-            if (czyPoprawnaOpcja)
+
+            if (int.TryParse(Console.ReadLine(), out int opcja))
             {
                 switch (opcja)
                 {
@@ -40,58 +39,54 @@ namespace ksiegarnia
                     default:
                         Console.WriteLine("Niepoprawny wybór");
                         return;
-
                 }
             }
             else
-            {   
+            {
                 Console.Clear();
                 Console.WriteLine("Niepoprawny wybór! \n Naciśnij Enter aby wrócic do menu...");
                 Console.ReadLine();
                 Main(null);
-                
-            }
-            
-            
-
-            
-        }
-
-        public static void foreachshowall()
-        {
-            foreach (var ksiazka in ksiazki)
-            {
-                Console.WriteLine(
-                    $"{ksiazka.ID}.\n" +
-                    $"{ksiazka.tytul} - {ksiazka.Autor} \n" +
-                    $"Rok Wydania: {ksiazka.RokWydania}, Gatunek: {ksiazka.Gatunek} \n" +
-                    $"Cena: {ksiazka.Cena}, {ksiazka.Stan}\n");
-
-                KsiazkaElektroniczna ksiazkaElektroniczna = (KsiazkaElektroniczna)ksiazka;
-                if (ksiazka.Wersja == WersjaKsiazki.Audiobook)
-                {
-                    string narrator = ksiazkaElektroniczna.narrator;
-                    Console.WriteLine($"Narrator: {narrator}");
-                }
-                else if (ksiazka.Wersja == WersjaKsiazki.Ebook)
-                {
-                    string rozmiar = ksiazkaElektroniczna.rozmiar;
-                    Console.WriteLine($"Rozmiar: {rozmiar}");
-                }
             }
         }
+
         public static void WyswietlWszystkieKsiazki()
         {
             Console.Clear();
+            Console.WriteLine("Wszystkie książki: ");
             string json = File.ReadAllText("ksiazki.json");
             List<Ksiazka> ksiazki = JsonConvert.DeserializeObject<List<Ksiazka>>(json);
+            List<KsiazkaElektroniczna> ksiazkiElektroniczne = JsonConvert.DeserializeObject<List<KsiazkaElektroniczna>>(json);
+            if (ksiazki != null)
+            {
+                foreach (var ksiazka in ksiazkiElektroniczne)
+                {
+                    Console.WriteLine(
+                        $"{ksiazka.ID}.\n" +
+                        $"{ksiazka.tytul} - {ksiazka.Autor} \n" +
+                        $"Rok Wydania: {ksiazka.RokWydania}, Gatunek: {ksiazka.Gatunek} \n" +
+                        $"Cena: {ksiazka.Cena}, {ksiazka.Stan} ");
 
-            Console.WriteLine("Wszystkie książki: ");
-            foreachshowall();
+                        if(ksiazka.Wersja != WersjaKsiazki.Papierowa)
+                            Console.Write($"Wersja : {ksiazka.Wersja}\n");
+                        
+                        if(ksiazka.narrator is not null)
+                            Console.Write($"Narrator: {ksiazka.narrator}\n");
+
+                        if (ksiazka.Wersja == WersjaKsiazki.Ebook)
+                            Console.Write($"Rozmiar pliku: {ksiazka.RozmiarPliku}\n");
+                                   
+                }
+            }
+            else
+            {
+                Console.WriteLine("Brak książek w bazie danych.");
+            }
             Console.WriteLine("Naciśnij Enter aby wrócić do menu...");
             Console.ReadLine();
             Main(null);
         }
+
         public static void WyszukajKsiazkePoTytule()
         {
             Console.Clear();
@@ -101,7 +96,7 @@ namespace ksiegarnia
             Console.WriteLine("Podaj tytuł książki: ");
             string szukanyTytul = Console.ReadLine();
 
-            if(string.IsNullOrEmpty(szukanyTytul))
+            if (string.IsNullOrEmpty(szukanyTytul))
             {
                 Console.WriteLine("Nie podano tytułu książki");
                 Console.WriteLine("Naciśnij Enter aby wrócić do menu...");
@@ -110,16 +105,40 @@ namespace ksiegarnia
             }
 
             bool czyZnaleziono = false;
-            foreachshowall();
-
-            if(!czyZnaleziono)
+            foreach (var ksiazka in ksiazki)
             {
-                Console.WriteLine("Nie znaleziono ksiązki o podanym tytule");
+                if (ksiazka.tytul.Equals(szukanyTytul, StringComparison.OrdinalIgnoreCase))
+                {
+                    czyZnaleziono = true;
+                    Console.WriteLine(
+                        $"{ksiazka.ID}.\n" +
+                        $"{ksiazka.tytul} - {ksiazka.Autor} \n" +
+                        $"Rok Wydania: {ksiazka.RokWydania}, Gatunek: {ksiazka.Gatunek} \n" +
+                        $"Cena: {ksiazka.Cena}, {ksiazka.Stan}\n");
+
+                    if (ksiazka is KsiazkaElektroniczna ksiazkaElektroniczna)
+                    {
+                        if (ksiazka.Wersja == WersjaKsiazki.Audiobook)
+                        {
+                            Console.WriteLine($"Narrator: {ksiazkaElektroniczna.narrator}");
+                        }
+                        else if (ksiazka.Wersja == WersjaKsiazki.Ebook)
+                        {
+                            Console.WriteLine($"Rozmiar: {ksiazkaElektroniczna.RozmiarPliku}");
+                        }
+                    }
+                }
+            }
+
+            if (!czyZnaleziono)
+            {
+                Console.WriteLine("Nie znaleziono książki o podanym tytule");
             }
             Console.WriteLine("Naciśnij Enter aby wrócić do menu...");
             Console.ReadLine();
             Main(null);
         }
+
         public static void DodajKsiazke()
         {
             Console.Clear();
@@ -139,14 +158,13 @@ namespace ksiegarnia
             string gatunek = Console.ReadLine();
 
             Console.WriteLine("\n Podaj cenę książki: ");
-            bool czyPoprawnaCena = float.TryParse(Console.ReadLine(), out float cena);
-            if (!czyPoprawnaCena)
+            if (!float.TryParse(Console.ReadLine(), out float cena))
             {
                 Console.WriteLine("Niepoprawna cena");
                 Console.WriteLine("Naciśnij Enter aby wrócić do menu...");
                 Console.ReadLine();
                 Main(null);
-            }   
+            }
 
             Console.WriteLine("\n Podaj stan książki: ");
             string stan = Console.ReadLine();
@@ -156,18 +174,15 @@ namespace ksiegarnia
             Console.WriteLine("2) Ebook");
             Console.WriteLine("3) Audiobook");
 
-            bool czyPoprawnaWersja = int.TryParse(Console.ReadLine(), out int wersja);
-            if (!czyPoprawnaWersja)
+            if (!int.TryParse(Console.ReadLine(), out int wersja))
             {
                 Console.WriteLine("Niepoprawna wersja");
                 Console.WriteLine("Naciśnij Enter aby wrócić do menu...");
                 Console.ReadLine();
                 Main(null);
             }
-            
 
-
-           ksiazki.Add(new Ksiazka
+            ksiazki.Add(new Ksiazka
             {
                 ID = (ksiazki.Count + 1).ToString(),
                 tytul = tytul,
@@ -178,7 +193,7 @@ namespace ksiegarnia
                 Stan = stan,
                 Wersja = (WersjaKsiazki)wersja
             });
-            
+
             json = JsonConvert.SerializeObject(ksiazki);
             File.WriteAllText("ksiazki.json", json);
 
@@ -186,8 +201,6 @@ namespace ksiegarnia
             Console.WriteLine("Naciśnij Enter aby wrócić do menu...");
             Console.ReadLine();
             Main(null);
-
-
         }
 
         public static void UsunKsiazke()
@@ -196,11 +209,29 @@ namespace ksiegarnia
             string json = File.ReadAllText("ksiazki.json");
             List<Ksiazka> ksiazki = JsonConvert.DeserializeObject<List<Ksiazka>>(json);
 
-            foreachshowall();
+            foreach (var ksiazka in ksiazki)
+            {
+                Console.WriteLine(
+                    $"{ksiazka.ID}.\n" +
+                    $"{ksiazka.tytul} - {ksiazka.Autor} \n" +
+                    $"Rok Wydania: {ksiazka.RokWydania}, Gatunek: {ksiazka.Gatunek} \n" +
+                    $"Cena: {ksiazka.Cena}, {ksiazka.Stan}\n");
+
+                if (ksiazka is KsiazkaElektroniczna ksiazkaElektroniczna)
+                {
+                    if (ksiazka.Wersja == WersjaKsiazki.Audiobook)
+                    {
+                        Console.WriteLine($"Narrator: {ksiazkaElektroniczna.narrator}");
+                    }
+                    else if (ksiazka.Wersja == WersjaKsiazki.Ebook)
+                    {
+                        Console.WriteLine($"Rozmiar: {ksiazkaElektroniczna.RozmiarPliku}");
+                    }
+                }
+            }
 
             Console.WriteLine("Podaj ID książki do usunięcia: ");
-            bool czyPoprawneId = int.TryParse(Console.ReadLine(), out int id);
-            if (czyPoprawneId)
+            if (int.TryParse(Console.ReadLine(), out int id))
             {
                 Ksiazka ksiazkaDoUsuniecia = ksiazki.FirstOrDefault(x => x.ID == id.ToString());
                 if (ksiazkaDoUsuniecia != null)
@@ -219,7 +250,6 @@ namespace ksiegarnia
             {
                 Console.WriteLine("Niepoprawne ID");
             }
-
         }
     }
 }
